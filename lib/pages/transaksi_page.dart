@@ -1,17 +1,35 @@
+import 'package:catataja/model/database.dart';
 import 'package:catataja/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class TransaksiPage extends StatefulWidget {
-  const TransaksiPage({super.key});
+  const TransaksiPage({Key? key}) : super(key: key);
 
   @override
   State<TransaksiPage> createState() => _TransaksiPageState();
 }
 
 class _TransaksiPageState extends State<TransaksiPage> {
+  final AppDb database = AppDb();
+  late int type;
   TextEditingController dateController = TextEditingController();
+  TextEditingController amountController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+
+  Future insert(int amount, DateTime date, String description) async {
+    DateTime now = DateTime.now();
+    final row = await database.into(database.transactions).insertReturning(
+        TransactionsCompanion.insert(
+            amount: amount,
+            transaction_date: date,
+            description: description,
+            created_at: now,
+            updated_at: now));
+    print('Apa ini:' + row.toString());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,6 +104,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
                       child: Container(
                         width: 200, // Atur lebar sesuai yang Anda inginkan
                         child: TextFormField(
+                          controller: amountController,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                             labelStyle:
@@ -163,7 +182,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
                                 lastDate: DateTime(2099));
                             if (pickedDate != null) {
                               String formattedDate =
-                                  DateFormat('dd-MM-yyyy').format(pickedDate);
+                                  DateFormat('yyyy-MM-dd').format(pickedDate);
                               dateController.text = formattedDate;
                             }
                           },
@@ -188,6 +207,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
                       child: Container(
                         width: 200, // Atur lebar sesuai yang Anda inginkan
                         child: TextFormField(
+                          controller: descriptionController,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                             labelStyle:
@@ -247,7 +267,12 @@ class _TransaksiPageState extends State<TransaksiPage> {
                           borderRadius: BorderRadius.circular(15),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        insert(
+                            int.parse(amountController.text),
+                            DateTime.parse(dateController.text),
+                            descriptionController.text);
+                      },
                       icon: Icon(Icons.save,
                           size: 20), // Ganti ikon sesuai kebutuhan
                       label: Text("Save"), // Ganti teks sesuai kebutuhan
