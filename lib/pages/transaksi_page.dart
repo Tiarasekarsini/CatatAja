@@ -183,7 +183,11 @@ class _TransaksiPageState extends State<TransaksiPage> {
                             if (pickedDate != null) {
                               String formattedDate =
                                   DateFormat('yyyy-MM-dd').format(pickedDate);
-                              dateController.text = formattedDate;
+                              setState(() {
+                                dateController.text = formattedDate;
+                              });
+                            } else {
+                              print('Date is not selected');
                             }
                           },
                         ),
@@ -253,7 +257,8 @@ class _TransaksiPageState extends State<TransaksiPage> {
                           Navigator.pop(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => HomePage()));
+                                  builder: (context) =>
+                                      HomePage(selectedDate: DateTime.now())));
                         },
                         child: Text("Cancel"),
                       ),
@@ -272,6 +277,7 @@ class _TransaksiPageState extends State<TransaksiPage> {
                             int.parse(amountController.text),
                             DateTime.parse(dateController.text),
                             descriptionController.text);
+                        Navigator.pop(context, true);
                       },
                       icon: Icon(Icons.save,
                           size: 20), // Ganti ikon sesuai kebutuhan

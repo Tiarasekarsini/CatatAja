@@ -18,6 +18,12 @@ class AppDb extends _$AppDb {
 
   @override
   int get schemaVersion => 6;
+
+  Stream<List<Transaction>> getTransactionsByDateRepo(DateTime date) {
+    final query = select(transactions)
+      ..where((t) => t.transaction_date.equals(date));
+    return query.watch();
+  }
 }
 
 LazyDatabase _openConnection() {
