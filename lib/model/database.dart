@@ -24,6 +24,14 @@ class AppDb extends _$AppDb {
       ..where((t) => t.transaction_date.equals(date));
     return query.watch();
   }
+
+  Stream<List<Transaction>> getTransactionsByMonthYear(int month, int year) {
+    final query = select(transactions)
+      ..where((t) =>
+          t.transaction_date.year.equals(year) &
+          t.transaction_date.month.equals(month));
+    return query.watch();
+  }
 }
 
 LazyDatabase _openConnection() {

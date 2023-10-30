@@ -14,6 +14,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   late DateTime selectedDate;
+  late DateTime selectedMonthYear;
   late List<Widget> _children;
   late int currentIndex;
 

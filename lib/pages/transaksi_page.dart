@@ -257,8 +257,9 @@ class _TransaksiPageState extends State<TransaksiPage> {
                           Navigator.pop(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      HomePage(selectedDate: DateTime.now())));
+                                  builder: (context) => HomePage(
+                                        selectedDate: DateTime.now(),
+                                      )));
                         },
                         child: Text("Cancel"),
                       ),

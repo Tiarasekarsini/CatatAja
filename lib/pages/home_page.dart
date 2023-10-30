@@ -15,12 +15,36 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final AppDb database = AppDb();
   double totalPemasukan = 0;
-
-  ///variable untuk total pemasukan
+  Map<String, double> totalPemasukanPerBulan = {};
 
   @override
   void initState() {
     super.initState();
+    calculateTotalPemasukan();
+  }
+
+  void calculateTotalPemasukan() {
+    final selectedMonth = widget.selectedDate.month;
+    final selectedYear = widget.selectedDate.year;
+
+    // Bersihkan total pemasukan per bulan
+    totalPemasukanPerBulan.clear();
+
+    // Dapatkan daftar transaksi dari bulan dan tahun yang dipilih
+    database
+        .getTransactionsByMonthYear(selectedMonth, selectedYear)
+        .listen((transactions) {
+      for (Transaction transaction in transactions) {
+        final monthYear =
+            "${transaction.transaction_date.month}/${transaction.transaction_date.year}";
+        totalPemasukanPerBulan.update(
+          monthYear,
+          (value) => value + transaction.amount,
+          ifAbsent: () => transaction.amount.toDouble(),
+        );
+      }
+      setState(() {});
+    });
   }
 
   @override
@@ -31,35 +55,33 @@ class _HomePageState extends State<HomePage> {
           child: Wrap(
             alignment: WrapAlignment.start,
             children: [
-              ///dashboard Total pemasukan
-              Padding(
-                padding: const EdgeInsets.all(25),
-                child: Card(
-                  elevation: 10,
-                  child: ListTile(
-                    title: Text("Pemasukkan",
-                        style: GoogleFonts.montserrat(
-                            fontSize: 15, fontWeight: FontWeight.w500)),
-                    subtitle: Text("Rp. ${totalPemasukan.toStringAsFixed(2)}",
-
-                        ///Menampilkan total pemasukan
-                        style: GoogleFonts.montserrat(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black)),
-                    leading: Container(
-                      child: Icon(
-                        Icons.download,
-                        color: Colors.green,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
+              for (var entry in totalPemasukanPerBulan.entries)
+                Padding(
+                  padding: const EdgeInsets.all(25),
+                  child: Card(
+                    elevation: 10,
+                    child: ListTile(
+                      title: Text("Pemasukkan - ${entry.key}",
+                          style: GoogleFonts.montserrat(
+                              fontSize: 15, fontWeight: FontWeight.w500)),
+                      subtitle: Text("Rp. ${entry.value.toStringAsFixed(2)}",
+                          style: GoogleFonts.montserrat(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black)),
+                      leading: Container(
+                        child: Icon(
+                          Icons.download,
+                          color: Colors.green,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
               Padding(
                 padding: const EdgeInsets.only(left: 25, right: 25, top: 25),
                 child: Container(
@@ -85,6 +107,7 @@ class _HomePageState extends State<HomePage> {
                             builder: (context) => TransaksiPage(),
                           ))
                               .then((value) {
+                            calculateTotalPemasukan();
                             setState(() {});
                           });
                         },
@@ -106,11 +129,11 @@ class _HomePageState extends State<HomePage> {
                       if (snapshot.hasData) {
                         if (snapshot.data!.length > 0) {
                           ///Hitung total pemasukan
-                          totalPemasukan = snapshot.data!
-                              .where((transaction) => transaction.amount > 0)
-                              .map((transaction) => transaction.amount)
-                              .fold(
-                                  0, (previous, current) => previous + current);
+                          // totalPemasukan = snapshot.data!
+                          //     .where((transaction) => transaction.amount > 0)
+                          //     .map((transaction) => transaction.amount)
+                          //     .fold(
+                          //         0, (previous, current) => previous + current);
                           return ListView.builder(
                             shrinkWrap: true, // Tambahkan shrinkWrap
                             itemCount: snapshot.data!.length,
