@@ -14,6 +14,14 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final AppDb database = AppDb();
+  double totalPemasukan = 0;
+
+  ///variable untuk total pemasukan
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +40,9 @@ class _HomePageState extends State<HomePage> {
                     title: Text("Pemasukkan",
                         style: GoogleFonts.montserrat(
                             fontSize: 15, fontWeight: FontWeight.w500)),
-                    subtitle: Text("Rp. 2.500.000",
+                    subtitle: Text("Rp. ${totalPemasukan.toStringAsFixed(2)}",
+
+                        ///Menampilkan total pemasukan
                         style: GoogleFonts.montserrat(
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
@@ -95,12 +105,19 @@ class _HomePageState extends State<HomePage> {
                     } else {
                       if (snapshot.hasData) {
                         if (snapshot.data!.length > 0) {
+                          ///Hitung total pemasukan
+                          totalPemasukan = snapshot.data!
+                              .where((transaction) => transaction.amount > 0)
+                              .map((transaction) => transaction.amount)
+                              .fold(
+                                  0, (previous, current) => previous + current);
                           return ListView.builder(
-                            shrinkWrap: true, // Tambahkan shrinkWrap di sini
+                            shrinkWrap: true, // Tambahkan shrinkWrap
                             itemCount: snapshot.data!.length,
                             itemBuilder: (context, index) {
+                              Transaction transaction = snapshot.data![index];
                               return Padding(
-                                // Tambahkan return di sini
+                                // Tambahkan return
                                 padding:
                                     const EdgeInsets.only(left: 25, right: 25),
                                 child: Card(
@@ -118,14 +135,14 @@ class _HomePageState extends State<HomePage> {
                                       ],
                                     ),
                                     title: Text(
-                                      "Rp. 20.000",
+                                      "Rp. ${transaction.amount.toString()}",
                                       style: GoogleFonts.montserrat(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                     subtitle: Text(
-                                      "Masuk",
+                                      transaction.description,
                                       style: GoogleFonts.montserrat(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w500,
@@ -149,56 +166,16 @@ class _HomePageState extends State<HomePage> {
                           );
                         } else {
                           return Center(
-                            child: Text("Tidak ada data"),
+                            child: Text("Belum ada transaksi"),
                           );
                         }
                       } else {
                         return Center(
-                          child: Text("Tidak ada data"),
+                          child: Text("Gagal mengambil data transaksi"),
                         );
                       }
                     }
                   })
-
-              // Padding(
-              //   padding: const EdgeInsets.only(left: 25, right: 25),
-              //   child: Card(
-              //     elevation: 10,
-              //     child: ListTile(
-              //       trailing: Row(
-              //         mainAxisSize: MainAxisSize.min,
-              //         children: [
-              //           Icon(
-              //             Icons.delete,
-              //             color: Colors.red,
-              //           ),
-              //           SizedBox(width: 10),
-              //           Icon(Icons.edit, color: Colors.blue),
-              //         ],
-              //       ),
-              //       title: Text(
-              //         "Rp. 20.000",
-              //         style: GoogleFonts.montserrat(
-              //             fontSize: 15, fontWeight: FontWeight.w500),
-              //       ),
-              //       subtitle: Text("Masuk",
-              //           style: GoogleFonts.montserrat(
-              //               fontSize: 13,
-              //               fontWeight: FontWeight.w500,
-              //               color: Colors.black)),
-              //       leading: Container(
-              //         child: Icon(
-              //           Icons.download,
-              //           color: Colors.green,
-              //         ),
-              //         decoration: BoxDecoration(
-              //           color: Colors.white,
-              //           borderRadius: BorderRadius.circular(8),
-              //         ),
-              //       ),
-              //     ),
-              //   ),
-              // ),
             ],
           ),
         ),
